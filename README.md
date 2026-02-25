@@ -9,13 +9,9 @@
 
 ## 📚 已学习项目
 
-| 项目      | 技术栈     | 类型       | 状态      | 学习重点                           |
-| --------- | ---------- | ---------- | --------- | ---------------------------------- |
-| nanobot   | Python     | AI Agent   | ✅ 已完成  | 事件驱动、多渠道、工具系统、记忆   |
-| Redis     | C          | 数据库     | 🔄 进行中 | 数据结构、事件模型                 |
-| Vue       | TypeScript | 前端框架   | ✅ 已完成  | 响应式原理                         |
-| LangChain | Python     | AI 框架    | 🔄 进行中 | Agent 架构                         |
-| Kafka     | Java/Scala | 分布式系统 | ⏳ 计划中  | 消息模型                           |
+| 项目    | 技术栈 | 类型     | 状态      | 学习重点                         |
+| ------- | ------ | -------- | --------- | -------------------------------- |
+| nanobot | Python | AI Agent | ✅ 已完成 | 事件驱动、多渠道、工具系统、记忆 |
 
 状态说明：
 
@@ -40,23 +36,20 @@
 
 ## 📂 仓库结构
 
+```
 source-notes/
 ├── nanobot/
-│ ├── 01-项目概览.md          # 基本信息、技术栈、目录结构
-│ ├── 02-架构设计.md          # 整体架构、设计模式、数据流
-│ ├── 03-核心引擎.md          # AgentLoop、ReAct 循环、记忆压缩
-│ ├── 04-上下文与记忆.md      # ContextBuilder、MemoryStore、SkillsLoader
-│ ├── 05-工具系统.md          # Tool 基类、注册表、9 个内置工具
-│ ├── 06-渠道层.md            # BaseChannel、ChannelManager、9 个渠道
-│ ├── 07-LLM提供商.md        # ProviderSpec、注册表、LiteLLM
-│ └── 08-总结与思考.md        # 设计亮点、取舍、可借鉴模式
-│
-├── vue/
-│ ├── 01-项目概览.md
-│ ├── 02-响应式原理.md
-│ └── 03-渲染流程.md
+│   ├── 01-项目概览.md        # 基本信息、技术栈、目录结构
+│   ├── 02-架构设计.md        # 整体架构、设计模式、数据流
+│   ├── 03-核心引擎.md        # AgentLoop、ReAct 循环、记忆压缩
+│   ├── 04-上下文与记忆.md    # ContextBuilder、MemoryStore、SkillsLoader
+│   ├── 05-工具系统.md        # Tool 基类、注册表、9 个内置工具
+│   ├── 06-渠道层.md          # BaseChannel、ChannelManager、9 个渠道
+│   ├── 07-LLM提供商.md      # ProviderSpec、注册表、LiteLLM
+│   └── 08-总结与思考.md      # 设计亮点、取舍、可借鉴模式
 │
 └── README.md
+```
 
 每个项目包含：
 
