@@ -1,0 +1,16 @@
+{
+  "name": "agent-loop-practice",
+  "version": "1.0.0",
+  "description": "从零用原生 Node.js + TypeScript 重写 Agent Loop，不依赖任何框架",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --env-file=.env.example dist/main.js",
+    "start:sse": "node --env-file=.env.example dist/sse-server.js",
+    "dev": "tsc && node --env-file=.env.example dist/main.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}
