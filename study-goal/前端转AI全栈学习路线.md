@@ -10,12 +10,12 @@
 
 ## 学习进度
 
-| 阶段 | 项目 | 周期 | 目标 | 状态 |
-|------|------|------|------|------|
+| 阶段   | 项目              | 周期   | 目标                               | 状态      |
+| ------ | ----------------- | ------ | ---------------------------------- | --------- |
 | 阶段 1 | learn-claude-code | 1-2 周 | 理解 Agent 原理 + Node.js 事件模型 | 🔄 学习中 |
-| 阶段 2 | anything-llm | 2-3 周 | 手撕 RAG + 后端基础件 | ⏳ 计划中 |
-| 阶段 3 | Flowise | 2-3 周 | 架构设计 + 数据建模 + 工作流 | ⏳ 计划中 |
-| 阶段 4 | CopilotKit | 1-2 周 | 前后端打通 + 作品集 | ⏳ 计划中 |
+| 阶段 2 | anything-llm      | 2-3 周 | 手撕 RAG + 后端基础件              | ⏳ 计划中 |
+| 阶段 3 | Flowise           | 2-3 周 | 架构设计 + 数据建模 + 工作流       | ⏳ 计划中 |
+| 阶段 4 | CopilotKit        | 1-2 周 | 前后端打通 + 作品集                | ⏳ 计划中 |
 
 ---
 
@@ -36,11 +36,11 @@
 
 ### 练习清单
 
-- [ ] 通读源码，画出完整的调用链路图
-- [ ] 不看源码，自己用原生 Node.js（不用框架）重写核心 Agent loop
-- [ ] 加上日志中间件，记录每次 LLM 调用的耗时、token 数、错误信息
-- [ ] 实现流式响应（SSE），用原生 `http` 模块，不用框架
-- [ ] 加上信号处理（SIGTERM/SIGINT），理解优雅退出
+- [√] 通读源码，画出完整的调用链路图
+- [√] 不看源码，自己用原生 Node.js（不用框架）重写核心 Agent loop
+- [√] 加上日志中间件，记录每次 LLM 调用的耗时、token 数、错误信息
+- [√] 实现流式响应（SSE），用原生 `http` 模块，不用框架
+- [√] 加上信号处理（SIGTERM/SIGINT），理解优雅退出
 
 ### 源码阅读要点
 
@@ -54,6 +54,7 @@
 ```
 
 重点关注：
+
 1. messages 数组如何构建和管理
 2. tool calling 的请求格式和响应解析
 3. 流式输出的实现方式（SSE vs WebSocket）
@@ -79,13 +80,13 @@
 
 ### 每一步的实现要求
 
-| 步骤 | 不用库手写 | 要理解的后端知识 |
-|------|-----------|----------------|
-| 文档上传 | `multer` 或原生 `multipart` 解析 | 文件流、Buffer、磁盘 IO |
-| 文本分块 | 手写 `splitByTokens` | 编码、tokenizer 原理 |
-| Embedding | 直接调 OpenAI API，不用 LangChain | HTTP 客户端、请求重试、速率限制 |
-| 向量存储 | 先用 SQLite + 余弦相似度，再换 pgvector | SQL、索引、连接池 |
-| API 层 | 原生 Express/Koa | 中间件模式、路由设计、认证 |
+| 步骤      | 不用库手写                              | 要理解的后端知识                |
+| --------- | --------------------------------------- | ------------------------------- |
+| 文档上传  | `multer` 或原生 `multipart` 解析        | 文件流、Buffer、磁盘 IO         |
+| 文本分块  | 手写 `splitByTokens`                    | 编码、tokenizer 原理            |
+| Embedding | 直接调 OpenAI API，不用 LangChain       | HTTP 客户端、请求重试、速率限制 |
+| 向量存储  | 先用 SQLite + 余弦相似度，再换 pgvector | SQL、索引、连接池               |
+| API 层    | 原生 Express/Koa                        | 中间件模式、路由设计、认证      |
 
 ### 练习清单
 
@@ -101,6 +102,7 @@
 ### 源码阅读要点
 
 anything-llm 的关键目录：
+
 - `server/` — Node.js 后端，重点看 API 路由和中间件
 - `server/utils/vectorDbProviders/` — 向量数据库抽象层
 - `server/utils/EmbeddingEngines/` — Embedding 提供商抽象
@@ -133,6 +135,7 @@ anything-llm 的关键目录：
 ### 源码阅读要点
 
 Flowise 的关键目录：
+
 - `packages/server/` — 后端核心，Express + TypeORM
 - `packages/server/src/entity/` — 数据库模型定义
 - `packages/server/src/routes/` — API 路由
@@ -164,6 +167,7 @@ Flowise 的关键目录：
 ### 最终交付物
 
 一个完整的 AI 问答应用，包含：
+
 - React 前端（CopilotKit 组件）
 - Node.js 后端（自写 RAG 管道）
 - 文档上传和管理
@@ -177,14 +181,14 @@ Flowise 的关键目录：
 
 每个阶段都要刻意练习这些，不是"知道"，而是"手写过"：
 
-| 技能 | 刻意练习方式 |
-|------|------------|
-| SQL | 不用 ORM，手写 JOIN、事务、索引优化 |
-| HTTP | 不用 axios，用原生 `fetch` / `http` 模块，理解请求生命周期 |
-| LLM API | 不用 LangChain，直接对接 OpenAI 兼容 API，理解 messages 格式、tool calling 协议 |
-| 配置管理 | 不用 dotenv，理解环境变量、进程、12-Factor App |
-| 错误处理 | 不依赖框架默认行为，手写全局错误中间件和重试逻辑 |
-| 并发控制 | 理解连接池、队列、限流，手写简单实现 |
+| 技能     | 刻意练习方式                                                                    |
+| -------- | ------------------------------------------------------------------------------- |
+| SQL      | 不用 ORM，手写 JOIN、事务、索引优化                                             |
+| HTTP     | 不用 axios，用原生 `fetch` / `http` 模块，理解请求生命周期                      |
+| LLM API  | 不用 LangChain，直接对接 OpenAI 兼容 API，理解 messages 格式、tool calling 协议 |
+| 配置管理 | 不用 dotenv，理解环境变量、进程、12-Factor App                                  |
+| 错误处理 | 不依赖框架默认行为，手写全局错误中间件和重试逻辑                                |
+| 并发控制 | 理解连接池、队列、限流，手写简单实现                                            |
 
 ---
 
