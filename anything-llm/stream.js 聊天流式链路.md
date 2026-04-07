@@ -120,39 +120,98 @@ messages = await LLMConnector.compressMessages({
 
 ## 4. 上下文三块：Pinned / Parsed / Vector
 
-1. **Pinned（`DocumentManager`）**  
-   - 把置顶文档 **全文**推进 **`contextTexts`**，让模型「看得见」。  
-   - **`sources` 里只放截断预览**（约 1000 字 + `...continued...`），避免引用区过长。  
-   - 生成 **`pinnedDocIdentifiers`**，向量检索时 **过滤**已置顶父文档，减少重复片段。
+这三块在 **`stream.js`** 里按 **固定顺序** 叠加到 **`contextTexts` / `sources`**：先 Pin，再 Parsed，再向量检索；之后才调用 **`fillSourceWindow`** 用历史补「文档条数窗口」（详见 §6）。向量检索仅在 **`embeddingsCount !== 0`** 时执行，否则得到空结果对象。
 
-2. **Parsed files（`WorkspaceParsedFiles.getContextFiles`）**  
-   - 会话里「已解析未嵌入」或上下文文件类数据，同样 **全文进 context**、摘要进 sources 展示逻辑与 pin 类似。
+### 4.1 Pinned（`DocumentManager`）
 
-3. **Vector（`performSimilaritySearch`）**  
-   - 用 **`updatedMessage`** 做查询（经 `LLMConnector.embedTextInput` 转向量，见各向量库实现）。  
-   - **`similarityThreshold`、`topN`** 来自 workspace 配置。  
-   - **`rerank`**：`vectorSearchMode === "rerank"` 时走宽召回 + 本地 reranker（Lance 等实现见 [`LanceDB 向量存储与检索.md`](./LanceDB%20向量存储与检索.md)）。
+- **调用方式**：`new DocumentManager({ workspace, maxTokens: LLMConnector.promptWindowLimit() }).pinnedDocs()`。  
+  **`maxTokens`** 用当前连接器的 **提示窗口上限**，与后续 **`compressMessages` / cannonball** 一致；源码注释说明：置顶会显著撑大上下文，但理论上超过模型承载时会被压缩——置顶更适合 **高上下文窗口** 的模型。
+- **写入 `contextTexts`**：每条置顶文档取 **`doc.pageContent` 全文** 压入数组，保证模型读到完整正文。
+- **写入 `sources`（展示用）**：对同一条文档构造对象 **`{ text: pageContent.slice(0, 1000) + "...continued on in source document...", ...metadata }`**，即 **约 1000 字符截断 + 固定续文提示**，避免 UI 引用区被长文淹没；**`metadata`** 为除 **`pageContent`** 外的字段展开。
+- **`pinnedDocIdentifiers`**：对每条 pin 文档执行 **`sourceIdentifier(doc)`**（与 `chats/index.js` 一致），收集后作为 **`performSimilaritySearch` 的 `filterIdentifiers`**。向量侧对每条命中用 **`sourceIdentifier(rest)`** 判断是否在集合中，**命中则跳过**，避免「同一段父文档」既全文置顶又在检索里重复出现一堆 chunk。
+
+### 4.2 Parsed files（`WorkspaceParsedFiles.getContextFiles`）
+
+- **作用**：把当前 **workspace / thread / user** 下、已解析进会话但未走向量库（或作为会话上下文文件）的材料注入本轮。
+- **拼装规则与 Pin 平行**：**`pageContent` 全文 → `contextTexts`**；**`sources` 里同样前 1000 字 + `...continued on in source document...`**。  
+  注意：**Parsed 不会像 Pin 那样**单独维护一组 id 传给向量 **`filterIdentifiers`**；若需避免与向量重复，取决于解析文件是否也进入向量库及 metadata 设计。
+
+### 4.3 Vector（`VectorDb.performSimilaritySearch`）
+
+- **查询文本**：**`input: updatedMessage`**（已过 **`grepCommand`** 的用户消息），嵌入由 **`LLMConnector.embedTextInput`** 完成；不同向量库 / 嵌入引擎实现路径不同，Lance 侧要点见 [`LanceDB 向量存储与检索.md`](./LanceDB%20向量存储与检索.md)。
+- **Workspace 参数**：**`similarityThreshold`**、**`topN`** 来自工作区配置；**`namespace`** 为 **`workspace.slug`**。
+- **过滤**：**`filterIdentifiers: pinnedDocIdentifiers`**，与 §4.1 呼应。
+- **Rerank**：**`rerank: workspace?.vectorSearchMode === "rerank"`**。为 `true` 时典型实现为 **放宽召回上限**（如按表规模算 `searchLimit`）再 **本地 cross-encoder 重排**，最终仍取 **`topN`**；失败时可能降级或打日志，以具体 provider 为准。
+- **失败**：若返回对象带 **`message`**（错误文案），**`stream.js`** 直接 **`writeResponseChunk` type `abort`** 并 **return**，本轮不再拼 LLM。
 
 ---
 
 ## 5. 为何 `contextTexts` 与 `sources` 拼接不一致？（源码注释要点）
 
-检索之后：
+向量检索与 **`fillSourceWindow`** 之后，**`stream.js`** 两行赋值拆开处理（与 `fillSourceWindow` 返回值用法强相关）：
 
-- **`contextTexts`** 追加 **`fillSourceWindow` 返回的 `contextTexts`**（含 **回填**的历史引用文本），供模型理解多轮语境。  
-- **`sources`** 只追加 **`vectorSearchResults.sources`**（**当前这次**向量检索结果），**不把历史回填的条目合并进展示用 sources**。
+```js
+contextTexts = [...contextTexts, ...filledSources.contextTexts];
+sources = [...sources, ...vectorSearchResults.sources];
+```
 
-设计意图（源码原意概括）：  
-模型需要「历史里用过的材料」保持连贯；但界面 **引用列表** 若带上用户认为与本次问题无关的旧文档，容易引发「乱引用」的反馈。因此 **回填只进 context，不进本次 citations 列表**。
+要点：
+
+1. **`contextTexts`**  
+   - 在 Pin、Parsed 之后，再 **整体追加** **`filledSources.contextTexts`**。  
+   - **`fillSourceWindow`** 内部会把 **本轮向量检索得到的 `sources`** 与 **必要时从历史回填的条目** 合并成一条「窗口内文档列表」，再 **`map(src => src.text)`** 得到 **给模型用的纯文本数组**。因此 **历史回填片段会进入模型上下文**，多轮追问时即使本轮向量命中很少，仍可能借上一轮引用 **补足语义连贯性**。
+
+2. **`sources`（最终随响应、落库、流式 chunk 带给前端的引用列表）**  
+   - 只 **`[...]` 追加 `vectorSearchResults.sources`**，**不**把 **`fillSourceWindow` 里因历史而多出来的那些条目**并入。  
+   - 换言之：**UI 上的 citations 只反映「这一次相似度检索」的结果**（外加前面已写入的 Pin / Parsed 摘要条目），**不**把「为补窗而从历史抄来的」旧引用再展示一遍。
+
+**设计意图**（与 **`stream.js` 内英文注释**一致，此处意译）：  
+模型需要能理解「之前回合用过的材料」，否则追问容易断档；但若把历史回填文档全部标成 **本次** 的引用，用户会感到 **「明明没在问这个文档，为什么下面又 cite 它」**，从而报 issue。折中方案是：**回填只增厚 `contextTexts`，不增厚本次展示的 `sources`**。若用户真要查旧引用，对话历史里上一轮 assistant 的引用仍可见。
+
+**实现细节提醒**：**`fillSourceWindow` 的返回值里其实也有一个合并后的 `sources` 数组**（含回填），**`stream.js` 刻意不用它更新对外 `sources`**，只用其派生的 **`contextTexts`**。
 
 ---
 
 ## 6. `fillSourceWindow`（`server/utils/helpers/chat/index.js`）
 
-- **输入**：本次 **`searchResults`**、`nDocs`（通常 `topN`）、**`rawHistory`**、**`filterIdentifiers`**。  
-- 若 **`searchResults.length >= nDocs`** 或 **无历史**：直接 `contextTexts = sources.map(s => s.text)`。  
-- 否则从 **最近历史往前**扫，解析每条 assistant 的 **`response.sources`**，挑选带 **`score`、`text`、`id`** 且不在 pin、未重复的 source，**凑满 nDocs**。  
-- 历史长度已由 **`recentChatHistory` 的 messageLimit** 限制，避免无限扫描。
+函数意图（文件头注释概括）：在 **Pin 已在外部处理** 的前提下，优先保证上下文里 **大约有 `nDocs` 条「文档级」材料**——顺序为 **向量检索结果 → 必要时从聊天记录往回抄曾经的 `sources`**，让 **query 模式**下「第二轮几乎搜不到 chunk」时仍有机会用上一轮材料回答，**chat / RAG** 下也能减少 **「检索条数不足 → 上下文漂」** 而不必次次开 rerank。
+
+### 6.1 入参（与 `stream.js` 的对应关系）
+
+| 参数 | 含义 | `stream.js` 传入 |
+| --- | --- | --- |
+| **`nDocs`** | 希望凑满的条数 | 取 `workspace?.topN`，未配置则 `4` |
+| **`searchResults`** | 本轮向量检索的 **`sources`** | **`vectorSearchResults.sources`** |
+| **`history`** | 原始聊天记录 | **`rawHistory`**（与 `recentChatHistory` 同源） |
+| **`filterIdentifiers`** | 需排除的文档标识（当前 pin） | **`pinnedDocIdentifiers`** |
+
+### 6.2 快速路径
+
+- 若 **`searchResults.length >= nDocs`**：**不需要回填**。内部 **`sources = [...searchResults]`**，返回 **`contextTexts: sources.map(src => src.text)`**。  
+- 若 **`history.length === 0`**：同样不扫历史，逻辑同上。
+
+### 6.3 回填路径（条数不足且有历史）
+
+1. 打日志：需要回填 **`nDocs - searchResults.length`** 条。  
+2. **`seenChunks`**：用 **`Set`** 记录已选用的 **`source.id`**，初值包含本轮 **`searchResults`** 里所有 **`id`**，避免重复。  
+3. **遍历顺序**：**`for (const chat of history.reverse())`** —— **`rawHistory` 通常旧→新**，**`reverse()` 后从新到旧**，优先用 **最近几轮** assistant 用过的引用。  
+4. 每条 **`chat`**：用 **`safeJsonParse(chat.response, { sources: [] })?.sources`** 取 **`response.sources`**；若无或非数组则跳过。  
+5. **可接受的历史 source** 必须同时满足：  
+   - **`filterIdentifiers.includes(sourceIdentifier(source)) === false`**（不是当前置顶那批）；  
+   - **`source` 自身带有 `score` 属性**（注释写「不能来自以前 pin 的那类」——实现上是用 **`hasOwnProperty("score")`** 过滤，**无 `score` 的 source 不会参与回填**，例如部分非向量来源）；  
+   - **`hasOwnProperty("text")`**；  
+   - **`seenChunks.has(source.id) === false`**（按 **id** 去重）。  
+6. 将 **`validSources`** 依次 **`push`** 到内部的 **`sources`**，直到 **`sources.length >= nDocs`** 或历史扫完。  
+7. 返回 **`{ sources, contextTexts: sources.map(src => src.text) }`**。
+
+### 6.4 与 `stream.js` 的组合方式
+
+- **`stream.js` 只把 `filledSources.contextTexts` 拼进 `contextTexts`**，**不把 `filledSources.sources` 拼进对外 `sources`**（见 §5）。  
+- **历史扫描规模**：注释写明 **`history` 来自 `recentChatHistory`，受 `messageLimit`（默认 20）约束**，因此不是全库扫聊天记录。
+
+### 6.5 文件内注释的利弊说明（可选读）
+
+同一文件承认：若用户 **完全换话题**，历史回填可能让 **上下文里** 出现与当前问题弱相关的旧 chunk；但优先保证 **回答正确** 与 **query 追问可用**，且 **新检索命中仍优先**（先放 **`searchResults`**，回填只补缺）。展示层通过 §5 的策略减轻 **「乱引用」** 的观感。
 
 ---
 
