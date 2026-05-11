@@ -17,6 +17,7 @@
 | [claude-code](./claude-code/README.md) | TypeScript / React(Ink) | CLI Agent（Anthropic 解包源码 v2.1.88） | 🔄 进行中 | 入口与 Bootstrap、QueryEngine/`query`、工具与权限、MCP、压缩、Bridge、遥测与远程策略 |
 | [anything-llm](./anything-llm/导读.md) | Node / React / Express | 全栈 RAG 应用 | 🔄 进行中 | 文档解析与分块、向量与检索、前后端与 collector 分工 |
 | [learn-claude-code](./learn-claude-code/s01-Agent-Loop.md) | Python / TypeScript | 教程 + 最小实践 | 🔄 进行中 | Agent 循环、子 Agent、Skills、Compact、Task、团队协议（S01–S12）+ `practice/` 可运行示例 |
+| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/contextual-embeddings/contextual-embeddings-summary.md) | Claude / RAG / Eval | Cookbook 思路笔记 | 🔄 进行中 | Contextual Embeddings、分类评估、RAG、Prompt Caching、Hybrid Search |
 
 ---
 
@@ -90,6 +91,10 @@ source-notes/
 ├── learn-claude-code/
 │   ├── s01-Agent-Loop.md … s12-Worktree-Task-Isolation.md  # 与 Claude Code 能力点对应的概念串讲
 │   └── practice/             # TypeScript 最小 Agent / SSE 等练习工程（见 package.json）
+│
+├── throught-of-claude-cookbooks/
+│   ├── classification/       # Claude Cookbooks 分类任务方法论与评估流程
+│   └── contextual-embeddings/ # Contextual Embeddings、Prompt Caching、Hybrid Search 与 Rerank
 │
 ├── sigma/                    # 预留目录（当前为空，可放 Sigma/其他主题笔记）
 │
