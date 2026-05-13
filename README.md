@@ -15,9 +15,10 @@
 | ---- | ------ | ---- | ---- | -------- |
 | nanobot | Python | AI Agent | ✅ 已完成 | 事件驱动、多渠道、工具系统、记忆 |
 | [claude-code](./claude-code/README.md) | TypeScript / React(Ink) | CLI Agent（Anthropic 解包源码 v2.1.88） | 🔄 进行中 | 入口与 Bootstrap、QueryEngine/`query`、工具与权限、MCP、压缩、Bridge、遥测与远程策略 |
-| [anything-llm](./anything-llm/导读.md) | Node / React / Express | 全栈 RAG 应用 | 🔄 进行中 | 文档解析与分块、向量与检索、前后端与 collector 分工 |
+| [anything-llm](./anything-llm/导读.md) | Node / React / Express | 全栈 RAG 应用 | 🔄 进行中 | 文档解析、分块、Embedding、LanceDB、流式链路、请求校验 |
+| [flowise](./flowise/Flowise-源码阅读-Roadmap.md) | TypeScript / React / Node | 可视化 AI Workflow / Agent 平台 | 🔄 进行中 | Monorepo 骨架、Server 主线、Components 节点系统、AgentFlow 画布、UI、企业能力 |
 | [learn-claude-code](./learn-claude-code/s01-Agent-Loop.md) | Python / TypeScript | 教程 + 最小实践 | 🔄 进行中 | Agent 循环、子 Agent、Skills、Compact、Task、团队协议（S01–S12）+ `practice/` 可运行示例 |
-| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/contextual-embeddings/contextual-embeddings-summary.md) | Claude / RAG / Eval | Cookbook 思路笔记 | 🔄 进行中 | Contextual Embeddings、分类评估、RAG、Prompt Caching、Hybrid Search |
+| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/contextual-embeddings/contextual-embeddings-summary.md) | Claude / RAG / Eval | Cookbook 思路笔记 | 🔄 进行中 | Contextual Embeddings、Classification、RAG、Summarization、Knowledge Graph、Text-to-SQL |
 
 ---
 
@@ -33,6 +34,14 @@
 **编号提示**：`01-主体架构` / `02-模块设计` 为总览；`01-入口Bootstrap与初始化`～`20-其他目录…` 为分模块深读，文件名并列出现属正常，以标题与索引为准。
 
 **配套**：概念串讲与最小实现见 [learn-claude-code](./learn-claude-code/s01-Agent-Loop.md)（S01 起），可与 `claude-code` 分篇交叉对照。
+
+---
+
+## 🗺 当前内容覆盖
+
+- [anything-llm](./anything-llm/导读.md)：已覆盖导读、文档解析流程、`TextSplitter` 分块策略、`stream.js` 聊天流式链路、`helpers` / `validatedRequest`、Native Embedding、LanceDB 检索。
+- [flowise](./flowise/Flowise-源码阅读-Roadmap.md)：已按“仓库骨架 → Server 主线 → Components 节点系统 → UI 前端 → AgentFlow 画布 → 数据库与企业能力”六阶段展开。
+- [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/contextual-embeddings/contextual-embeddings-summary.md)：当前已整理 `classification`、`contextual-embeddings`、`knowledge_graph`、`retrieval_augmented_generation`、`summarization`、`text_to_sql` 六个主题。
 
 ---
 
@@ -84,17 +93,34 @@ source-notes/
 │   └── 分模块 01～20（入口/QueryEngine/工具/MCP/…，见索引）
 │
 ├── anything-llm/
-│   ├── 导读.md               # 总览与目录地图
+│   ├── 导读.md                         # 总览与目录地图
 │   ├── 文档解析流程.md
-│   └── TextSplitter 分块策略.md
+│   ├── TextSplitter 分块策略.md
+│   ├── stream.js 聊天流式链路.md
+│   ├── helpers与validatedRequest详解.md
+│   ├── Native Embedding 引擎.md
+│   └── LanceDB 向量存储与检索.md
+│
+├── flowise/
+│   ├── Flowise-源码阅读-Roadmap.md     # 总体阅读路线
+│   ├── 阶段一-仓库骨架与启动方式.md
+│   ├── 阶段二-后端主线-Server包.md
+│   ├── 阶段三-Components节点系统.md
+│   ├── 阶段四-UI前端视角.md
+│   ├── 阶段五-AgentFlow画布体系.md
+│   └── 阶段六-数据库企业能力与运维.md
 │
 ├── learn-claude-code/
 │   ├── s01-Agent-Loop.md … s12-Worktree-Task-Isolation.md  # 与 Claude Code 能力点对应的概念串讲
 │   └── practice/             # TypeScript 最小 Agent / SSE 等练习工程（见 package.json）
 │
 ├── throught-of-claude-cookbooks/
-│   ├── classification/       # Claude Cookbooks 分类任务方法论与评估流程
-│   └── contextual-embeddings/ # Contextual Embeddings、Prompt Caching、Hybrid Search 与 Rerank
+│   ├── classification/                   # 分类任务方法论与评估流程
+│   ├── contextual-embeddings/            # Contextual Retrieval、Prompt Caching
+│   ├── knowledge_graph/                  # 结构化抽取、实体消歧、图谱问答
+│   ├── retrieval_augmented_generation/   # Summary Indexing、Re-Ranker、RAG 评估
+│   ├── summarization/                    # 长文档摘要、结构化摘要、Promptfoo 评估
+│   └── text_to_sql/                      # Schema 检索、SQL 生成、自我修复循环
 │
 ├── sigma/                    # 预留目录（当前为空，可放 Sigma/其他主题笔记）
 │
