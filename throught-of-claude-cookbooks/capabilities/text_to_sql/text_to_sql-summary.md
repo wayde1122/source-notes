@@ -1,6 +1,6 @@
 # Text-to-SQL 技术要点总结
 
-来源：`D:\claude-cookbooks\capabilities\text_to_sql\guide_zh.ipynb`
+github - claude-cookbooks\capabilities\text_to_sql\guide_zh.ipynb
 
 ## 1. 核心目标
 

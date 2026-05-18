@@ -1,6 +1,6 @@
 # Retrieval Augmented Generation 技术要点总结
 
-来源：`D:\claude-cookbooks\capabilities\retrieval_augmented_generation\guide.ipynb`
+github - claude-cookbooks\capabilities\retrieval_augmented_generation\guide.ipynb
 
 ## 1. 核心目标
 
