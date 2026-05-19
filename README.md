@@ -18,7 +18,7 @@
 | [anything-llm](./anything-llm/导读.md) | Node / React / Express | 全栈 RAG 应用 | 🔄 进行中 | 文档解析、分块、Embedding、LanceDB、流式链路、请求校验 |
 | [flowise](./flowise/Flowise-源码阅读-Roadmap.md) | TypeScript / React / Node | 可视化 AI Workflow / Agent 平台 | 🔄 进行中 | Monorepo 骨架、Server 主线、Components 节点系统、AgentFlow 画布、UI、企业能力 |
 | [learn-claude-code](./learn-claude-code/s01-Agent-Loop.md) | Python / TypeScript | 教程 + 最小实践 | 🔄 进行中 | Agent 循环、子 Agent、Skills、Compact、Task、团队协议（S01–S12）+ `practice/` 可运行示例 |
-| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/capabilities/contextual-embeddings/contextual-embeddings-summary.md) | Claude / RAG / Eval / Agent Patterns | Cookbook 思路笔记 | 🔄 进行中 | Contextual Embeddings、Classification、RAG、Summarization、Knowledge Graph、Text-to-SQL、基础 Agent Workflow |
+| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/capabilities/contextual-embeddings-summary.md) | Claude / RAG / Eval / Agent Patterns | Cookbook 思路笔记 | 🔄 进行中 | Capabilities、Tool Use、Agent Patterns、Claude Agent SDK、Managed Agents、Multimodal、Third-party 集成 |
 
 ---
 
@@ -41,7 +41,7 @@
 
 - [anything-llm](./anything-llm/导读.md)：已覆盖导读、文档解析流程、`TextSplitter` 分块策略、`stream.js` 聊天流式链路、`helpers` / `validatedRequest`、Native Embedding、LanceDB 检索。
 - [flowise](./flowise/Flowise-源码阅读-Roadmap.md)：已按“仓库骨架 → Server 主线 → Components 节点系统 → UI 前端 → AgentFlow 画布 → 数据库与企业能力”六阶段展开。
-- [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/capabilities/contextual-embeddings/contextual-embeddings-summary.md)：当前已整理 `classification`、`contextual-embeddings`、`knowledge_graph`、`retrieval_augmented_generation`、`summarization`、`text_to_sql` 六个主题，并补充 `patterns` 下的 Basic Workflows、Evaluator-Optimizer、Orchestrator-Workers 三篇工作流笔记。
+- [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/capabilities/contextual-embeddings-summary.md)：当前已整理 `capabilities`、`tool_use`、`patterns`、`claude_agent_sdk`、`managed_agents`、`multimodal`、`third_party` 等 Cookbook 主题笔记。
 
 ---
 
@@ -115,13 +115,20 @@ source-notes/
 │   └── practice/             # TypeScript 最小 Agent / SSE 等练习工程（见 package.json）
 │
 ├── throught-of-claude-cookbooks/
-│   ├── classification/                   # 分类任务方法论与评估流程
-│   ├── contextual-embeddings/            # Contextual Retrieval、Prompt Caching
-│   ├── knowledge_graph/                  # 结构化抽取、实体消歧、图谱问答
-│   ├── retrieval_augmented_generation/   # Summary Indexing、Re-Ranker、RAG 评估
-│   ├── summarization/                    # 长文档摘要、结构化摘要、Promptfoo 评估
-│   ├── text_to_sql/                      # Schema 检索、SQL 生成、自我修复循环
-│   └── patterns/                         # Basic Workflows、Evaluator-Optimizer、Orchestrator-Workers
+│   ├── capabilities/                     # Classification、Contextual Embeddings、RAG、摘要、知识图谱、Text-to-SQL
+│   ├── tool_use/                         # 结构化 JSON、工具选择、并行工具、记忆、威胁情报等 Tool Use 笔记
+│   ├── patterns/                         # Basic Workflows、Evaluator-Optimizer、Orchestrator-Workers
+│   ├── claude_agent_sdk/                 # Claude Agent SDK 示例与迁移笔记
+│   ├── managed_agents/                   # Claude Managed Agents 任务编排与生产实践
+│   ├── multimodal/                       # Vision、多模态、图表/PPT 读取与子 Agent
+│   ├── third_party/                      # LlamaIndex、Pinecone、MongoDB、Deepgram、ElevenLabs 等集成
+│   ├── misc/                             # Batch、Evals、JSON mode、Prompt caching、Citations 等杂项
+│   ├── coding/                           # 前端审美提示词
+│   ├── extended_thinking/                # Extended thinking 与工具调用
+│   ├── finetuning/                       # Bedrock finetuning
+│   ├── observability/                    # Usage cost API
+│   ├── skills/                           # Skills notebook 笔记
+│   └── tool_evaluation/                  # Tool evaluation
 │
 ├── sigma/                    # 预留目录（当前为空，可放 Sigma/其他主题笔记）
 │
