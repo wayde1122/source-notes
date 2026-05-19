@@ -18,7 +18,7 @@
 | [anything-llm](./anything-llm/导读.md) | Node / React / Express | 全栈 RAG 应用 | 🔄 进行中 | 文档解析、分块、Embedding、LanceDB、流式链路、请求校验 |
 | [flowise](./flowise/Flowise-源码阅读-Roadmap.md) | TypeScript / React / Node | 可视化 AI Workflow / Agent 平台 | 🔄 进行中 | Monorepo 骨架、Server 主线、Components 节点系统、AgentFlow 画布、UI、企业能力 |
 | [learn-claude-code](./learn-claude-code/s01-Agent-Loop.md) | Python / TypeScript | 教程 + 最小实践 | 🔄 进行中 | Agent 循环、子 Agent、Skills、Compact、Task、团队协议（S01–S12）+ `practice/` 可运行示例 |
-| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/contextual-embeddings/contextual-embeddings-summary.md) | Claude / RAG / Eval | Cookbook 思路笔记 | 🔄 进行中 | Contextual Embeddings、Classification、RAG、Summarization、Knowledge Graph、Text-to-SQL |
+| [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/capabilities/contextual-embeddings/contextual-embeddings-summary.md) | Claude / RAG / Eval / Agent Patterns | Cookbook 思路笔记 | 🔄 进行中 | Contextual Embeddings、Classification、RAG、Summarization、Knowledge Graph、Text-to-SQL、基础 Agent Workflow |
 
 ---
 
@@ -41,7 +41,7 @@
 
 - [anything-llm](./anything-llm/导读.md)：已覆盖导读、文档解析流程、`TextSplitter` 分块策略、`stream.js` 聊天流式链路、`helpers` / `validatedRequest`、Native Embedding、LanceDB 检索。
 - [flowise](./flowise/Flowise-源码阅读-Roadmap.md)：已按“仓库骨架 → Server 主线 → Components 节点系统 → UI 前端 → AgentFlow 画布 → 数据库与企业能力”六阶段展开。
-- [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/contextual-embeddings/contextual-embeddings-summary.md)：当前已整理 `classification`、`contextual-embeddings`、`knowledge_graph`、`retrieval_augmented_generation`、`summarization`、`text_to_sql` 六个主题。
+- [throught-of-claude-cookbooks](./throught-of-claude-cookbooks/capabilities/contextual-embeddings/contextual-embeddings-summary.md)：当前已整理 `classification`、`contextual-embeddings`、`knowledge_graph`、`retrieval_augmented_generation`、`summarization`、`text_to_sql` 六个主题，并补充 `patterns` 下的 Basic Workflows、Evaluator-Optimizer、Orchestrator-Workers 三篇工作流笔记。
 
 ---
 
@@ -120,7 +120,8 @@ source-notes/
 │   ├── knowledge_graph/                  # 结构化抽取、实体消歧、图谱问答
 │   ├── retrieval_augmented_generation/   # Summary Indexing、Re-Ranker、RAG 评估
 │   ├── summarization/                    # 长文档摘要、结构化摘要、Promptfoo 评估
-│   └── text_to_sql/                      # Schema 检索、SQL 生成、自我修复循环
+│   ├── text_to_sql/                      # Schema 检索、SQL 生成、自我修复循环
+│   └── patterns/                         # Basic Workflows、Evaluator-Optimizer、Orchestrator-Workers
 │
 ├── sigma/                    # 预留目录（当前为空，可放 Sigma/其他主题笔记）
 │
